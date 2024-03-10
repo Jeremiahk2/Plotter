@@ -3,7 +3,19 @@
 #include <SFML/Graphics.hpp>
 #include <cstdio>
 #include <deque>
+#include <iostream>
+#include <cmath>
 
+float mapToRange(float theta) {
+    theta = fmod(theta, 2 * M_PI);
+    if (fabs(theta) <= M_PI) { //If theta is from -pi to pi
+        return theta;
+    }
+    else if (theta > M_PI) { //if theta is greater than pi
+        return theta - 2 * M_PI;
+    }
+    return theta + 2 * M_PI; //if theta is less than -pi
+}
 
 
 int main() {
@@ -23,8 +35,10 @@ int main() {
 
     std::deque<sf::CircleShape> clickCircles;
 
-    sf::VertexArray lines(sf::Lines, 50);
+    sf::VertexArray lines(sf::Lines, 100);
     int numLines = 0;
+    int numArrows = 0;
+    sf::VertexArray arrows(sf::Lines, 400);
 
 
     while (window.isOpen()) {
@@ -41,6 +55,7 @@ int main() {
                 if (event.type == sf::Event::MouseButtonPressed) {
                     if (event.mouseButton.button == sf::Mouse::Left) {
                         target = sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
+                        sf::Vector2f direction;
                         bool collision = false;
                         //Update mouse click circles.
                         for (int i = 0; i < clickCircles.size(); i++) {
@@ -62,8 +77,29 @@ int main() {
                             lines[numLines++] = target;
                         }
                         else {
+                            direction = lines[numLines - 1].position;
+                            direction = target - direction;
                             lines[numLines++] = lines[numLines - 1];
                             lines[numLines++] = target;
+                        }
+                        float theta = atan2(direction.y, direction.x);
+                        if (theta != 0) {
+                            theta = mapToRange(theta - M_PI);
+                            float leftTail = mapToRange(theta + .45);
+                            float rightTail = mapToRange(theta - .45);
+
+                            sf::Vector2f leftVector(cos(leftTail), sin(leftTail));
+                            sf::Vector2f rightVector(cos(rightTail), sin(rightTail));
+                            leftVector *= 20.f;
+                            rightVector *= 20.f;
+                            leftVector += target;
+                            rightVector += target;
+
+                            arrows[0 + numArrows * 4] = target;
+                            arrows[1 + numArrows * 4] = leftVector;
+                            arrows[2 + numArrows * 4] = target;
+                            arrows[3 + numArrows * 4] = rightVector;
+                            numArrows++;
                         }
                     }
                 }
@@ -75,6 +111,7 @@ int main() {
                 window.draw(clickCircles[i]);
             }
             window.draw(lines);
+            window.draw(arrows);
             window.display();
         }
         
