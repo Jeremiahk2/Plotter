@@ -41,15 +41,21 @@ int main() {
                 if (event.type == sf::Event::MouseButtonPressed) {
                     if (event.mouseButton.button == sf::Mouse::Left) {
                         target = sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
+                        bool collision = false;
                         //Update mouse click circles.
-                        sf::CircleShape c;
-                        c.setRadius(5.0);
-                        c.setOrigin(5.0, 5.0);
-                        c.setFillColor(sf::Color::Green);
-                        c.setPosition(target);
-                        clickCircles.push_back(c);
-                        if (clickCircles.size() > 5) {
-                            clickCircles.pop_front();
+                        for (int i = 0; i < clickCircles.size(); i++) {
+                            if (clickCircles[i].getGlobalBounds().contains(target)) {
+                                target = clickCircles[i].getPosition();
+                                collision = true;
+                            }
+                        }
+                        if (!collision) {
+                            sf::CircleShape c;
+                            c.setRadius(5.0);
+                            c.setOrigin(5.0, 5.0);
+                            c.setFillColor(sf::Color::Green);
+                            c.setPosition(target);
+                            clickCircles.push_back(c);
                         }
                         if (numLines == 0) {
                             lines[numLines++] = target;
