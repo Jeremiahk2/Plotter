@@ -85,8 +85,8 @@ int main() {
                         float theta = atan2(direction.y, direction.x);
                         if (theta != 0) {
                             theta = mapToRange(theta - M_PI);
-                            float leftTail = mapToRange(theta + .45);
-                            float rightTail = mapToRange(theta - .45);
+                            float leftTail = mapToRange(theta + .20);
+                            float rightTail = mapToRange(theta - .20);
 
                             sf::Vector2f leftVector(cos(leftTail), sin(leftTail));
                             sf::Vector2f rightVector(cos(rightTail), sin(rightTail));
