@@ -30,7 +30,7 @@ int main() {
 
     sf::RenderWindow window;
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    window.create(sf::VideoMode(640, 480, desktop.bitsPerPixel), "Game Window", sf::Style::Default);
+    window.create(sf::VideoMode(1920, 1080, desktop.bitsPerPixel), "Game Window", sf::Style::Default);
 
     sf::Vector2f target;
 
@@ -128,6 +128,19 @@ int main() {
                         }
                     }
                 }
+                if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z) {
+                    std::cout << "Ran" << std::endl;
+                        numArrows--;
+                        numLines -= 2;
+                        arrows[0 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
+                        arrows[1 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
+                        arrows[2 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
+                        arrows[3 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
+                        lines[numLines] = sf::Vector2f(0.f, 0.f);
+                        lines[numLines + 1] = sf::Vector2f(0.f, 0.f);
+
+                        clickCircles.pop_back();
+                } 
             }
 
             //Draw to window.
