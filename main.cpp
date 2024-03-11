@@ -5,6 +5,7 @@
 #include <deque>
 #include <iostream>
 #include <cmath>
+#include <fstream>
 
 float mapToRange(float theta) {
     theta = fmod(theta, 2 * M_PI);
@@ -134,10 +135,23 @@ int main() {
             window.draw(arrows);
             window.display();
         }
-        
 
         //We've processed a tic, wait for the next one.
         lastTic = currentTic;
     }
+
+    //Export graph to a file.
+    std::ofstream output ("output.txt", std::ofstream::out);
+    for (int i = 2; i < numLines; i++) {
+        if (i % 2 == 0) {
+            output << "Vertex A: " << lines[i].position.x << "," << lines[i].position.y << "  ";
+        }
+        else {
+            output << "Vertex B: " << lines[i].position.x << "," << lines[i].position.y << "   ";
+            output << "Weight: " << sqrt(pow((lines[i].position - lines[i-1].position).x, 2) + pow((lines[i].position - lines[i-1].position).y, 2)) << std::endl;;
+        }
+    }
+    output.close();
+
     return EXIT_SUCCESS;
 }
