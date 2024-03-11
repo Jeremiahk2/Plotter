@@ -74,7 +74,8 @@ int main() {
                             c.setPosition(target);
                             clickCircles.push_back(c);
                         }
-                        if (numLines == 0) {
+                        //If there is no source, the current vertex will be the source.
+                        if (numLines == 0 || (lastVertex.x == -1.f && lastVertex.y == -1.f)) {
                             lines[numLines++] = target;
                             lines[numLines++] = target;
                             lastVertex = target;
@@ -107,7 +108,7 @@ int main() {
                         }
                     }
                     //Right click signifies changing origin point for line. 
-                    //This is a connected graph, so must be on an existing node to take effect.
+                    //If the click is on a node, set that node as the source. Otherwise, delete the source.
                     if (event.mouseButton.button == sf::Mouse::Right) {
                         target = sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
                         bool collision = false;
@@ -121,6 +122,9 @@ int main() {
                         //Does not support overlapping collisions.
                         if (collision) {
                             lastVertex = target;
+                        }
+                        else {
+                            lastVertex = sf::Vector2f(-1.f, -1.f);
                         }
                     }
                 }
@@ -142,13 +146,19 @@ int main() {
 
     //Export graph to a file.
     std::ofstream output ("output.txt", std::ofstream::out);
-    for (int i = 2; i < numLines; i++) {
-        if (i % 2 == 0) {
-            output << "Vertex A: " << lines[i].position.x << "," << lines[i].position.y << "  ";
+    for (int i = 0; i < numLines; i++) {
+        //Don't count lines that begin and end on the same point.
+        if (!(i % 2 == 0 && lines[i].position.x == lines[i+1].position.x && lines[i].position.y == lines[i+1].position.y) ) {
+            if (i % 2 == 0) {
+                output << "Vertex A: " << lines[i].position.x << "," << lines[i].position.y << "  ";
+            }
+            else {
+                output << "Vertex B: " << lines[i].position.x << "," << lines[i].position.y << "   ";
+                output << "Weight: " << sqrt(pow((lines[i].position - lines[i-1].position).x, 2) + pow((lines[i].position - lines[i-1].position).y, 2)) << std::endl;;
+            }
         }
         else {
-            output << "Vertex B: " << lines[i].position.x << "," << lines[i].position.y << "   ";
-            output << "Weight: " << sqrt(pow((lines[i].position - lines[i-1].position).x, 2) + pow((lines[i].position - lines[i-1].position).y, 2)) << std::endl;;
+            i++;
         }
     }
     output.close();
