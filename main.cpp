@@ -40,7 +40,7 @@ int main() {
     int numArrows = 0;
     sf::VertexArray arrows(sf::Lines, 400);
 
-
+    sf::Vector2f lastVertex;
     while (window.isOpen()) {
         //Get the current tic.
         currentTic = frameTime.getTime();
@@ -53,6 +53,7 @@ int main() {
                     window.close();
                 }
                 if (event.type == sf::Event::MouseButtonPressed) {
+                    //Left click signifies new node and line being drawn.
                     if (event.mouseButton.button == sf::Mouse::Left) {
                         target = sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
                         sf::Vector2f direction;
@@ -75,12 +76,14 @@ int main() {
                         if (numLines == 0) {
                             lines[numLines++] = target;
                             lines[numLines++] = target;
+                            lastVertex = target;
                         }
                         else {
-                            direction = lines[numLines - 1].position;
+                            direction = lastVertex;
                             direction = target - direction;
-                            lines[numLines++] = lines[numLines - 1];
+                            lines[numLines++] = lastVertex;
                             lines[numLines++] = target;
+                            lastVertex = target;
                         }
                         float theta = atan2(direction.y, direction.x);
                         if (theta != 0) {
@@ -100,6 +103,23 @@ int main() {
                             arrows[2 + numArrows * 4] = target;
                             arrows[3 + numArrows * 4] = rightVector;
                             numArrows++;
+                        }
+                    }
+                    //Right click signifies changing origin point for line. 
+                    //This is a connected graph, so must be on an existing node to take effect.
+                    if (event.mouseButton.button == sf::Mouse::Right) {
+                        target = sf::Vector2f(event.mouseButton.x, event.mouseButton.y);
+                        bool collision = false;
+                        //Update mouse click circles.
+                        for (int i = 0; i < clickCircles.size(); i++) {
+                            if (clickCircles[i].getGlobalBounds().contains(target)) {
+                                target = clickCircles[i].getPosition();
+                                collision = true;
+                            }
+                        }
+                        //Does not support overlapping collisions.
+                        if (collision) {
+                            lastVertex = target;
                         }
                     }
                 }
