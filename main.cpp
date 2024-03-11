@@ -128,17 +128,24 @@ int main() {
                     }
                 }
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z) {
-                    std::cout << "Ran" << std::endl;
-                        numArrows--;
-                        numLines -= 2;
-                        arrows[0 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
-                        arrows[1 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
-                        arrows[2 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
-                        arrows[3 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
-                        lines[numLines] = sf::Vector2f(0.f, 0.f);
-                        lines[numLines + 1] = sf::Vector2f(0.f, 0.f);
-
+                    numArrows--;
+                    numLines -= 2;
+                    //Remove the arrow from view.
+                    arrows[0 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
+                    arrows[1 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
+                    arrows[2 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
+                    arrows[3 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
+                    //If the last arrow created it's own vertex, delete the vertex too.
+                    bool deleteCircle = false;
+                    if (clickCircles.back().getGlobalBounds().contains(lines[numLines + 1].position)) {
+                        deleteCircle = true;
+                    }
+                    if (deleteCircle) {
                         clickCircles.pop_back();
+                    }
+                    //Remove the line from view.
+                    lines[numLines] = sf::Vector2f(0.f, 0.f);
+                    lines[numLines + 1] = sf::Vector2f(0.f, 0.f);
                 } 
             }
 
