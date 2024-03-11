@@ -36,10 +36,10 @@ int main() {
 
     std::deque<sf::CircleShape> clickCircles;
 
-    sf::VertexArray lines(sf::Lines, 100);
+    sf::VertexArray lines(sf::Lines, 400);
     int numLines = 0;
     int numArrows = 0;
-    sf::VertexArray arrows(sf::Lines, 400);
+    sf::VertexArray arrows(sf::Lines, 800);
 
     sf::Vector2f lastVertex;
     while (window.isOpen()) {
@@ -86,9 +86,8 @@ int main() {
                             lines[numLines++] = lastVertex;
                             lines[numLines++] = target;
                             lastVertex = target;
-                        }
-                        float theta = atan2(direction.y, direction.x);
-                        if (theta != 0) {
+
+                            float theta = atan2(direction.y, direction.x);
                             theta = mapToRange(theta - M_PI);
                             float leftTail = mapToRange(theta + .20);
                             float rightTail = mapToRange(theta - .20);
