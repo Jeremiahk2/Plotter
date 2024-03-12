@@ -40,6 +40,7 @@ int main() {
     std::deque<sf::CircleShape> clickCircles;
 
     sf::VertexArray lines(sf::Lines, 400);
+    int numLinePoints = 0;
     int numLines = 0;
     int numArrows = 0;
     sf::VertexArray arrows(sf::Lines, 800);
@@ -57,8 +58,9 @@ int main() {
             for (int i = 0; i < 2; i++) {
                 getline(data, valueOne, ',');
                 getline(data, valueTwo, ',');
-                lines[numLines++] = sf::Vector2f(stoi(valueOne), stoi(valueTwo));
+                lines[numLinePoints++] = sf::Vector2f(stoi(valueOne), stoi(valueTwo));
             }
+            numLines++;
             infile >> lineString;
         }
         infile >> lineString;
@@ -126,16 +128,16 @@ int main() {
                             clickCircles.push_back(c);
                         }
                         //If there is no source, the current vertex will be the source.
-                        if (numLines == 0 || (lastVertex.x == -1.f && lastVertex.y == -1.f)) {
-                            lines[numLines++] = target;
-                            lines[numLines++] = target;
+                        if (numLinePoints == 0 || (lastVertex.x == -1.f && lastVertex.y == -1.f)) {
+                            lines[numLinePoints++] = target;
+                            lines[numLinePoints++] = target;
                             lastVertex = target;
                         }
                         else {
                             direction = lastVertex;
                             direction = target - direction;
-                            lines[numLines++] = lastVertex;
-                            lines[numLines++] = target;
+                            lines[numLinePoints++] = lastVertex;
+                            lines[numLinePoints++] = target;
                             lastVertex = target;
 
                             float theta = atan2(direction.y, direction.x);
@@ -154,8 +156,11 @@ int main() {
                             arrows[1 + numArrows * 4] = leftVector;
                             arrows[2 + numArrows * 4] = target;
                             arrows[3 + numArrows * 4] = rightVector;
+                            numLines++;
                             numArrows++;
                         }
+                        std::cout << "Number of Vertices: " << clickCircles.size() << std::endl;
+                        std::cout << "Number of Edges: " << numLines << std::endl;
                     }
                     //Right click signifies changing origin point for line. 
                     //If the click is on a node, set that node as the source. Otherwise, delete the source.
@@ -176,11 +181,13 @@ int main() {
                         else {
                             lastVertex = sf::Vector2f(-1.f, -1.f);
                         }
+                        std::cout << "Number of Vertices: " << clickCircles.size() << std::endl;
+                        std::cout << "Number of Edges: " << numLines << std::endl;  
                     }
                 }
                 if (event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::Z) {
                     numArrows--;
-                    numLines -= 2;
+                    numLinePoints -= 2;
                     //Remove the arrow from view.
                     arrows[0 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
                     arrows[1 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
@@ -188,15 +195,18 @@ int main() {
                     arrows[3 + numArrows * 4] = sf::Vector2f(0.f, 0.f);
                     //If the last arrow created it's own vertex, delete the vertex too.
                     bool deleteCircle = false;
-                    if (clickCircles.back().getGlobalBounds().contains(lines[numLines + 1].position)) {
+                    if (clickCircles.back().getGlobalBounds().contains(lines[numLinePoints + 1].position)) {
                         deleteCircle = true;
                     }
                     if (deleteCircle) {
                         clickCircles.pop_back();
                     }
                     //Remove the line from view.
-                    lines[numLines] = sf::Vector2f(0.f, 0.f);
-                    lines[numLines + 1] = sf::Vector2f(0.f, 0.f);
+                    lines[numLinePoints] = sf::Vector2f(0.f, 0.f);
+                    lines[numLinePoints + 1] = sf::Vector2f(0.f, 0.f);
+
+                    std::cout << "Number of Vertices: " << clickCircles.size() << std::endl;
+                    std::cout << "Number of Edges: " << numLines << std::endl;
                 } 
             }
 
@@ -217,7 +227,7 @@ int main() {
     //Export graph to a file.
     std::ofstream output ("output.txt", std::ofstream::out);
     output << "VertexAx,VertexAy,VertexBx,VertexBy,Weight" << std::endl;
-    for (int i = 0; i < numLines; i++) {
+    for (int i = 0; i < numLinePoints; i++) {
         //Don't count lines that begin and end on the same point.
         if (!(i % 2 == 0 && lines[i].position.x == lines[i+1].position.x && lines[i].position.y == lines[i+1].position.y) ) {
             if (i % 2 == 0) {
