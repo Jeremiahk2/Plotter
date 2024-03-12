@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 
-#define READ_INPUT 1
+#define READ_INPUT 0
 
 float mapToRange(float theta) {
     theta = fmod(theta, 2 * M_PI);
@@ -33,7 +33,7 @@ int main() {
 
     sf::RenderWindow window;
     sf::VideoMode desktop = sf::VideoMode::getDesktopMode();
-    window.create(sf::VideoMode(1920, 1080, desktop.bitsPerPixel), "Game Window", sf::Style::Default);
+    window.create(sf::VideoMode(640, 480, desktop.bitsPerPixel), "Game Window", sf::Style::Default);
 
     sf::Vector2f target;
 
