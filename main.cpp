@@ -6,6 +6,9 @@
 #include <iostream>
 #include <cmath>
 #include <fstream>
+#include <sstream>
+
+#define READ_INPUT 1
 
 float mapToRange(float theta) {
     theta = fmod(theta, 2 * M_PI);
@@ -40,6 +43,54 @@ int main() {
     int numLines = 0;
     int numArrows = 0;
     sf::VertexArray arrows(sf::Lines, 800);
+
+    if (READ_INPUT) {
+        std::ifstream infile("input.txt");
+        std::string lineString;
+        infile >> lineString;
+        infile >> lineString;
+        
+        while (lineString != std::string("ArrowLine1PointAx,ArrowLine1PointAy,ArrowLine1PointBx,ArrowLine1PointBy,ArrowLine2PointAx,ArrowLine2PointAy,ArrowLine2PointBx,ArrowLine2PointBy")) {
+            std::stringstream data(lineString);
+            std::string valueOne;
+            std::string valueTwo;
+            for (int i = 0; i < 2; i++) {
+                getline(data, valueOne, ',');
+                getline(data, valueTwo, ',');
+                lines[numLines++] = sf::Vector2f(stoi(valueOne), stoi(valueTwo));
+            }
+            infile >> lineString;
+        }
+        infile >> lineString;
+        while (lineString != std::string("CirclePointAx,CirclePointBx")) {
+            std::stringstream data(lineString);
+            std::string valueOne;
+            std::string valueTwo;
+            for (int i = 0; i < 4; i++) {
+                getline(data, valueOne, ',');
+                getline(data, valueTwo, ',');
+                arrows[i + numArrows * 4] = sf::Vector2f(stoi(valueOne), stoi(valueTwo));
+            }
+            numArrows++;
+            infile >> lineString;
+        }
+        infile >> lineString;
+        while (lineString != std::string("End")) {
+            std::stringstream data(lineString);
+            std::string valueOne;
+            std::string valueTwo;
+            getline(data, valueOne, ',');
+            getline(data, valueTwo, ',');
+
+            sf::CircleShape c;
+            c.setRadius(5.0);
+            c.setOrigin(5.0, 5.0);
+            c.setFillColor(sf::Color::Green);
+            c.setPosition(sf::Vector2f(stoi(valueOne), stoi(valueTwo)));
+            clickCircles.push_back(c);
+            infile >> lineString;
+        }
+    }
 
     sf::Vector2f lastVertex;
     while (window.isOpen()) {
@@ -165,21 +216,41 @@ int main() {
 
     //Export graph to a file.
     std::ofstream output ("output.txt", std::ofstream::out);
+    output << "VertexAx,VertexAy,VertexBx,VertexBy,Weight" << std::endl;
     for (int i = 0; i < numLines; i++) {
         //Don't count lines that begin and end on the same point.
         if (!(i % 2 == 0 && lines[i].position.x == lines[i+1].position.x && lines[i].position.y == lines[i+1].position.y) ) {
             if (i % 2 == 0) {
-                output << "Vertex A: " << lines[i].position.x << "," << lines[i].position.y << "  ";
+                output << lines[i].position.x << "," << lines[i].position.y << ",";
             }
             else {
-                output << "Vertex B: " << lines[i].position.x << "," << lines[i].position.y << "   ";
-                output << "Weight: " << sqrt(pow((lines[i].position - lines[i-1].position).x, 2) + pow((lines[i].position - lines[i-1].position).y, 2)) << std::endl;;
+                output << lines[i].position.x << "," << lines[i].position.y << ",";
+                output << sqrt(pow((lines[i].position - lines[i-1].position).x, 2) + pow((lines[i].position - lines[i-1].position).y, 2)) << std::endl;;
             }
         }
         else {
             i++;
         }
     }
+    output << "ArrowLine1PointAx,ArrowLine1PointAy,ArrowLine1PointBx,ArrowLine1PointBy,ArrowLine2PointAx,ArrowLine2PointAy,ArrowLine2PointBx,ArrowLine2PointBy" << std::endl;
+    for (int i = 0; i < numArrows; i++) {
+        for (int j = 0; j < 4; j++) {
+            if (j != 0) {
+                output << ",";
+            }
+            output << arrows[i * 4 + j].position.x << "," << arrows[i * 4 + j].position.y;
+
+        }
+        output << std::endl;
+    }
+
+    output << "CirclePointAx,CirclePointBx" << std::endl;
+    for (int i = 0; i < clickCircles.size(); i++) {
+        output << clickCircles[i].getPosition().x << "," << clickCircles[i].getPosition().y << std::endl;
+    }
+    output << "End" << std::endl;
+
+
     output.close();
 
     return EXIT_SUCCESS;
