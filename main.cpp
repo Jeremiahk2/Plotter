@@ -52,8 +52,8 @@ int main() {
         infile >> lineString;
         
         while (lineString != std::string("ArrowLine1PointAx,ArrowLine1PointAy,ArrowLine1PointBx,ArrowLine1PointBy,ArrowLine2PointAx,ArrowLine2PointAy,ArrowLine2PointBx,ArrowLine2PointBy")) {
-            currentTic = frameTime.getTime();
-            if (currentTic > lastTic) {
+            // currentTic = frameTime.getTime();
+            // if (currentTic > lastTic) {
                 std::stringstream data(lineString);
                 std::string valueOne;
                 std::string valueTwo;
@@ -66,7 +66,7 @@ int main() {
                 //Begin delete
                 std::string weight;
                 getline(data, weight, ',');
-                std::cout << numLines << ": " << stoi(weight) << std::endl;
+                // std::cout << numLines << ": " << stoi(weight) << std::endl;
                 //Draw to window.
                 window.clear(sf::Color(0, 128, 128));
                 for (int i = 0; i < clickCircles.size(); i++) {
@@ -77,8 +77,8 @@ int main() {
                 window.display();
                 //End delete
                 infile >> lineString;
-            }
-            lastTic = currentTic;
+            // }
+            // lastTic = currentTic;
         }
         infile >> lineString;
         while (lineString != std::string("CirclePointAx,CirclePointBx")) {
@@ -95,19 +95,32 @@ int main() {
         }
         infile >> lineString;
         while (lineString != std::string("End")) {
-            std::stringstream data(lineString);
-            std::string valueOne;
-            std::string valueTwo;
-            getline(data, valueOne, ',');
-            getline(data, valueTwo, ',');
+            currentTic = frameTime.getTime();
+            if (currentTic > lastTic) {
+                std::stringstream data(lineString);
+                std::string valueOne;
+                std::string valueTwo;
+                getline(data, valueOne, ',');
+                getline(data, valueTwo, ',');
 
-            sf::CircleShape c;
-            c.setRadius(5.0);
-            c.setOrigin(5.0, 5.0);
-            c.setFillColor(sf::Color::Green);
-            c.setPosition(sf::Vector2f(stoi(valueOne), stoi(valueTwo)));
-            clickCircles.push_back(c);
-            infile >> lineString;
+                sf::CircleShape c;
+                c.setRadius(5.0);
+                c.setOrigin(5.0, 5.0);
+                c.setFillColor(sf::Color::Green);
+                c.setPosition(sf::Vector2f(stoi(valueOne), stoi(valueTwo)));
+                clickCircles.push_back(c);
+                
+                std::cout << clickCircles.size() << ": " << c.getPosition().x << "," << c.getPosition().y << std::endl;
+                window.clear(sf::Color(0, 128, 128));
+                for (int i = 0; i < clickCircles.size(); i++) {
+                    window.draw(clickCircles[i]);
+                }
+                window.draw(lines);
+                window.draw(arrows);
+                window.display();
+                infile >> lineString;
+            }
+            lastTic = currentTic;
         }
     }
 
