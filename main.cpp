@@ -95,8 +95,8 @@ int main() {
         }
         infile >> lineString;
         while (lineString != std::string("End")) {
-            currentTic = frameTime.getTime();
-            if (currentTic > lastTic) {
+            // currentTic = frameTime.getTime();
+            // if (currentTic > lastTic) {
                 std::stringstream data(lineString);
                 std::string valueOne;
                 std::string valueTwo;
@@ -119,8 +119,8 @@ int main() {
                 window.draw(arrows);
                 window.display();
                 infile >> lineString;
-            }
-            lastTic = currentTic;
+            // }
+            // lastTic = currentTic;
         }
     }
 
@@ -289,7 +289,37 @@ int main() {
     }
     output << "End" << std::endl;
 
+    std::ofstream smallOutput ("small.txt", std::ofstream::out);
+    for (int i = 0; i < clickCircles.size(); i++) {
+        smallOutput << i << "," << clickCircles[i].getPosition().x << "," << clickCircles[i].getPosition().y << std::endl;
+    }
+    smallOutput << "Edges:" << std::endl;
 
+    for (int i = 0; i < numLinePoints; i++) {
+        int pointID = 0;
+        for (int j = 0; j < clickCircles.size(); j++) {
+            if (clickCircles[j].getPosition().x == lines[i].position.x && clickCircles[j].getPosition().y == lines[i].position.y) {
+                pointID = j;
+            }
+        }
+        //Don't count lines that begin and end on the same point.
+        if (!(i % 2 == 0 && lines[i].position.x == lines[i+1].position.x && lines[i].position.y == lines[i+1].position.y) ) {
+            if (i % 2 == 0) {
+                smallOutput << pointID << ",";
+            }
+            else {
+                smallOutput << pointID << ",";
+                smallOutput << sqrt(pow((lines[i].position - lines[i-1].position).x, 2) + pow((lines[i].position - lines[i-1].position).y, 2)) << std::endl;;
+            }
+        }
+        else {
+            i++;
+        }
+    }
+    smallOutput << "End" << std::endl;
+
+
+    smallOutput.close();
     output.close();
 
     return EXIT_SUCCESS;
